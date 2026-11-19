@@ -1,0 +1,51 @@
+{
+  "info": {
+    "name": "PBJ-2 Lab 1 Loan Approval API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Deploy BPMN & DMN",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:8092/workflow/deploy"
+      }
+    },
+    {
+      "name": "2. Start Process - Eligible (APPROVED)",
+      "request": {
+        "method": "POST",
+        "header": [{"key": "Content-Type", "value": "application/json"}],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"applicantId\": \"SYN-APP-001-PASS\",\n  \"applicantName\": \"Alice Johnson\",\n  \"age\": 35,\n  \"employmentStatus\": \"EMPLOYED\",\n  \"requestedAmount\": 10000,\n  \"monthlyIncome\": 5000,\n  \"existingMonthlyDebt\": 800,\n  \"loanTermMonths\": 60\n}"
+        },
+        "url": "http://localhost:8092/workflow/start"
+      }
+    },
+    {
+      "name": "3. Direct Credit Assessment",
+      "request": {
+        "method": "POST",
+        "header": [{"key": "Content-Type", "value": "application/json"}],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"applicantId\": \"SYN-APP-DIRECT\",\n  \"monthlyIncome\": 5000,\n  \"requestedAmount\": 10000,\n  \"employmentStatus\": \"EMPLOYED\"\n}"
+        },
+        "url": "http://localhost:8088/credit/assess"
+      }
+    },
+    {
+      "name": "4. Toggle Failure Mode",
+      "request": {
+        "method": "POST",
+        "header": [{"key": "Content-Type", "value": "application/json"}],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"enabled\": true}"
+        },
+        "url": "http://localhost:8088/admin/failure-mode"
+      }
+    }
+  ]
+}

@@ -1,0 +1,72 @@
+{
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.6.0",
+  "exporter": {
+    "name": "Camunda Modeler",
+    "version": "5.50.1"
+  },
+  "schemaVersion": 16,
+  "id": "Form_ImmediateHumanAssessment",
+  "type": "default",
+  "components": [
+    {
+      "text": "### URGENT CLINICAL ASSESSMENT REQUIRED\n**Notice: Educational triage demonstration workflow only. Not for real patient care.**\n\nPatient indicators require immediate emergency clinical assessment.",
+      "type": "text",
+      "id": "Text_UrgentNotice"
+    },
+    {
+      "label": "Synthetic Patient Reference",
+      "type": "textfield",
+      "id": "Field_PatientRef",
+      "key": "patientRef",
+      "disabled": true
+    },
+    {
+      "label": "Reported Symptoms",
+      "type": "textarea",
+      "id": "Field_Symptoms",
+      "key": "symptomsSummary",
+      "disabled": true
+    },
+    {
+      "label": "Pain Score (1-10)",
+      "type": "number",
+      "id": "Field_PainScore",
+      "key": "painScore",
+      "disabled": true
+    },
+    {
+      "label": "Triage Category",
+      "type": "textfield",
+      "id": "Field_TriageCategory",
+      "key": "triageCategory",
+      "disabled": true
+    },
+    {
+      "label": "Clinical Assessment Action Taken",
+      "type": "radio",
+      "id": "Field_UrgentAction",
+      "key": "urgentAssessmentAction",
+      "validate": {
+        "required": true
+      },
+      "values": [
+        {
+          "label": "Admit to Emergency Care",
+          "value": "ADMIT_EMERGENCY"
+        },
+        {
+          "label": "Immediate Physician Evaluation",
+          "value": "EVALUATE_NOW"
+        }
+      ]
+    },
+    {
+      "label": "Triage Clinician Notes",
+      "type": "textarea",
+      "id": "Field_ClinicianNotes",
+      "key": "clinicianNotes"
+    }
+  ]
+}
+

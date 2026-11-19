@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/" xmlns:dmndi="https://www.omg.org/spec/DMN/20191111/DMNDI/" xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/" xmlns:biodi="http://bpmn.io/schema/dmn/biodi/2.0" id="Definitions_LoanDecision" name="Loan Decision Definitions" namespace="http://camunda.org/schema/1.0/dmn" exporter="Camunda Modeler" exporterVersion="5.50.1">
+  <decision id="loan-decision" name="Loan Decision">
+    <decisionTable id="DecisionTable_LoanDecision" hitPolicy="FIRST">
+      <input id="Input_CreditScore" label="Credit Score">
+        <inputExpression id="InputExpr_CreditScore" typeRef="number">
+          <text>creditScore</text>
+        </inputExpression>
+      </input>
+      <input id="Input_DTI" label="Debt-to-Income Ratio">
+        <inputExpression id="InputExpr_DTI" typeRef="number">
+          <text>debtToIncomeRatio</text>
+        </inputExpression>
+      </input>
+      <input id="Input_EmploymentStatus" label="Employment Status">
+        <inputExpression id="InputExpr_EmploymentStatus" typeRef="string">
+          <text>employmentStatus</text>
+        </inputExpression>
+      </input>
+      <input id="Input_RequestedAmount" label="Requested Amount" biodi:width="171">
+        <inputExpression id="InputExpr_RequestedAmount" typeRef="number">
+          <text>requestedAmount</text>
+        </inputExpression>
+      </input>
+      <output id="Output_Decision" label="Decision" name="decision" typeRef="string" />
+      <output id="Output_Reason" label="Reason" name="reason" typeRef="string" biodi:width="221" />
+      <rule id="Rule_1">
+        <description>High credit score and low debt-to-income ratio qualify for automated approval.</description>
+        <inputEntry id="InputEntry_1_1">
+          <text>&gt;= 750</text>
+        </inputEntry>
+        <inputEntry id="InputEntry_1_2">
+          <text>&lt;= 0.35</text>
+        </inputEntry>
+        <inputEntry id="InputEntry_1_3">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="InputEntry_1_4">
+          <text>-</text>
+        </inputEntry>
+        <outputEntry id="OutputEntry_1_1">
+          <text>"APPROVED"</text>
+        </outputEntry>
+        <outputEntry id="OutputEntry_1_2">
+          <text>"Exceptional credit score and low debt-to-income ratio qualify for instant approval"</text>
+        </outputEntry>
+      </rule>
+      <rule id="Rule_2">
+        <description>Strong credit with stable employment qualifies for approval.</description>
+        <inputEntry id="InputEntry_2_1">
+          <text>&gt;= 700</text>
+        </inputEntry>
+        <inputEntry id="InputEntry_2_2">
+          <text>&lt;= 0.40</text>
+        </inputEntry>
+        <inputEntry id="InputEntry_2_3">
+          <text>"EMPLOYED"</text>
+        </inputEntry>
+        <inputEntry id="InputEntry_2_4">
+          <text>-</text>
+        </inputEntry>
+        <outputEntry id="OutputEntry_2_1">
+          <text>"APPROVED"</text>
+        </outputEntry>
+        <outputEntry id="OutputEntry_2_2">
+          <text>"Strong credit score with stable employment qualifies for standard approval"</text>
+        </outputEntry>
+      </rule>
+      <rule id="Rule_3">
+        <description>Credit score below underwriting floor is rejected.</description>
+        <inputEntry id="InputEntry_3_1">
+          <text>&lt; 580</text>
+        </inputEntry>
+        <inputEntry id="InputEntry_3_2">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="InputEntry_3_3">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="InputEntry_3_4">
+          <text>-</text>
+        </inputEntry>
+        <outputEntry id="OutputEntry_3_1">
+          <text>"REJECTED"</text>
+        </outputEntry>
+        <outputEntry id="OutputEntry_3_2">
+          <text>"Credit score below minimum underwriting floor (580)"</text>
+        </outputEntry>
+      </rule>
+      <rule id="Rule_4">
+        <description>Unemployed applicant requesting high loan amount is rejected.</description>
+        <inputEntry id="InputEntry_4_1">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="InputEntry_4_2">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="InputEntry_4_3">
+          <text>"UNEMPLOYED"</text>
+        </inputEntry>
+        <inputEntry id="InputEntry_4_4">
+          <text>&gt; 5000</text>
+        </inputEntry>
+        <outputEntry id="OutputEntry_4_1">
+          <text>"REJECTED"</text>
+        </outputEntry>
+        <outputEntry id="OutputEntry_4_2">
+          <text>"Unemployed applicant requested amount exceeds unsecured threshold ($5,000)"</text>
+        </outputEntry>
+      </rule>
+      <rule id="Rule_5">
+        <description>Excessive debt-to-income ratio violates lending policies.</description>
+        <inputEntry id="InputEntry_5_1">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="InputEntry_5_2">
+          <text>&gt; 0.50</text>
+        </inputEntry>
+        <inputEntry id="InputEntry_5_3">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="InputEntry_5_4">
+          <text>-</text>
+        </inputEntry>
+        <outputEntry id="OutputEntry_5_1">
+          <text>"REJECTED"</text>
+        </outputEntry>
+        <outputEntry id="OutputEntry_5_2">
+          <text>"Debt-to-income ratio exceeds regulatory maximum limit of 50%"</text>
+        </outputEntry>
+      </rule>
+      <rule id="Rule_6">
+        <description>Borderline credit scores require human underwriter evaluation.</description>
+        <inputEntry id="InputEntry_6_1">
+          <text>[620..699]</text>
+        </inputEntry>
+        <inputEntry id="InputEntry_6_2">
+          <text>&lt;= 0.45</text>
+        </inputEntry>
+        <inputEntry id="InputEntry_6_3">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="InputEntry_6_4">
+          <text>-</text>
+        </inputEntry>
+        <outputEntry id="OutputEntry_6_1">
+          <text>"MANUAL_REVIEW"</text>
+        </outputEntry>
+        <outputEntry id="OutputEntry_6_2">
+          <text>"Borderline credit profile requires senior underwriter review"</text>
+        </outputEntry>
+      </rule>
+      <rule id="Rule_7">
+        <description>High value self-employed loans require tax verification.</description>
+        <inputEntry id="InputEntry_7_1">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="InputEntry_7_2">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="InputEntry_7_3">
+          <text>"SELF_EMPLOYED"</text>
+        </inputEntry>
+        <inputEntry id="InputEntry_7_4">
+          <text>&gt;= 25000</text>
+        </inputEntry>
+        <outputEntry id="OutputEntry_7_1">
+          <text>"MANUAL_REVIEW"</text>
+        </outputEntry>
+        <outputEntry id="OutputEntry_7_2">
+          <text>"Self-employed high-value loan requires income documentation audit"</text>
+        </outputEntry>
+      </rule>
+      <rule id="Rule_8">
+        <description>Catch-all routing for any application not matched above.</description>
+        <inputEntry id="InputEntry_8_1">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="InputEntry_8_2">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="InputEntry_8_3">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="InputEntry_8_4">
+          <text>-</text>
+        </inputEntry>
+        <outputEntry id="OutputEntry_8_1">
+          <text>"MANUAL_REVIEW"</text>
+        </outputEntry>
+        <outputEntry id="OutputEntry_8_2">
+          <text>"Standard catch-all: Application routed for manual underwriter review"</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  <dmndi:DMNDI>
+    <dmndi:DMNDiagram id="DMNDiagram_LoanDecision">
+      <dmndi:DMNShape id="DMNShape_loan-decision" dmnElementRef="loan-decision">
+        <dc:Bounds height="80" width="180" x="160" y="80" />
+      </dmndi:DMNShape>
+    </dmndi:DMNDiagram>
+  </dmndi:DMNDI>
+</definitions>

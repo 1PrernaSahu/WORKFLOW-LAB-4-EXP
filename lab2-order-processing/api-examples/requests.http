@@ -1,0 +1,134 @@
+### Lab 2 – Order Processing: HTTP Requests
+
+@workerUrl = http://localhost:8094
+@mockApiUrl = http://localhost:8089
+
+### ===== DEPLOY =====
+
+### Deploy BPMN + DMN
+POST {{workerUrl}}/workflow/deploy
+
+### ===== TOPOLOGY =====
+
+### Zeebe Connection Check
+GET {{workerUrl}}/workflow/topology
+
+### ===== TC-L2-01: STANDARD ORDER SUCCESS =====
+
+### Standard customer, in-stock item, success payment token
+POST {{workerUrl}}/workflow/start
+Content-Type: application/json
+
+{
+  "customerRef": "SYN-CUST-001",
+  "customerCategory": "STANDARD",
+  "productId": "PROD-001",
+  "quantity": 1,
+  "deliveryPreference": "STANDARD",
+  "paymentToken": "tok_test_success"
+}
+
+### ===== TC-L2-02: GOLD CUSTOMER EXPRESS =====
+
+POST {{workerUrl}}/workflow/start
+Content-Type: application/json
+
+{
+  "customerRef": "SYN-CUST-002",
+  "customerCategory": "GOLD",
+  "productId": "PROD-002",
+  "quantity": 2,
+  "deliveryPreference": "EXPRESS",
+  "paymentToken": "tok_test_success"
+}
+
+### ===== TC-L2-03: OUT OF STOCK =====
+
+### Product not in inventory – Expected: Stock Failure end event
+POST {{workerUrl}}/workflow/start
+Content-Type: application/json
+
+{
+  "customerRef": "SYN-CUST-003",
+  "customerCategory": "STANDARD",
+  "productId": "PROD-OUT-OF-STOCK",
+  "quantity": 1,
+  "deliveryPreference": "STANDARD",
+  "paymentToken": "tok_test_success"
+}
+
+### ===== TC-L2-04: DECLINED PAYMENT =====
+
+### Valid stock but payment declined – Expected: Payment Failed end event
+POST {{workerUrl}}/workflow/start
+Content-Type: application/json
+
+{
+  "customerRef": "SYN-CUST-004",
+  "customerCategory": "STANDARD",
+  "productId": "PROD-003",
+  "quantity": 2,
+  "deliveryPreference": "STANDARD",
+  "paymentToken": "tok_test_declined"
+}
+
+### ===== TC-L2-05: HIGH VALUE (MANUAL VERIFICATION) =====
+
+### NEXT_DAY delivery + STANDARD customer → triggers manual review
+POST {{workerUrl}}/workflow/start
+Content-Type: application/json
+
+{
+  "customerRef": "SYN-CUST-005",
+  "customerCategory": "STANDARD",
+  "productId": "PROD-001",
+  "quantity": 5,
+  "deliveryPreference": "NEXT_DAY",
+  "paymentToken": "tok_test_success"
+}
+
+### ===== PAYMENT API DIRECT CALL =====
+
+### Direct payment charge (bypasses process)
+POST {{mockApiUrl}}/payments/charge
+Content-Type: application/json
+
+{
+  "customerRef": "SYN-CUST-DIRECT",
+  "paymentToken": "tok_test_success",
+  "orderTotal": 299.99
+}
+
+### ===== FAILURE INJECTION =====
+
+### Enable payment API failure mode
+POST {{mockApiUrl}}/admin/failure-mode
+Content-Type: application/json
+
+{"enabled": true}
+
+### Disable payment API failure mode
+POST {{mockApiUrl}}/admin/failure-mode
+Content-Type: application/json
+
+{"enabled": false}
+
+### Enable worker failure mode
+POST {{workerUrl}}/worker-config/failure-mode
+Content-Type: application/json
+
+{"enabled": true}
+
+### Disable worker failure mode
+POST {{workerUrl}}/worker-config/failure-mode
+Content-Type: application/json
+
+{"enabled": false}
+
+### ===== STATUS =====
+
+GET {{mockApiUrl}}/health
+GET {{mockApiUrl}}/admin/status
+GET {{workerUrl}}/actuator/health
+GET {{workerUrl}}/worker-config/status
+

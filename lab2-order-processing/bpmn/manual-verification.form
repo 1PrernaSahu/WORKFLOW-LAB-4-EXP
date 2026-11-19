@@ -1,0 +1,86 @@
+{
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.6.0",
+  "exporter": {
+    "name": "Camunda Modeler",
+    "version": "5.50.1"
+  },
+  "schemaVersion": 16,
+  "id": "Form_OrderManualVerification",
+  "type": "default",
+  "components": [
+    {
+      "text": "### High-Value Order Verification\nThis order has been flagged by the DMN priority rules as requiring manual order verification prior to payment authorization.",
+      "type": "text",
+      "id": "Text_OrderHeader"
+    },
+    {
+      "label": "Customer Reference",
+      "type": "textfield",
+      "id": "Field_CustomerRef",
+      "key": "customerRef",
+      "disabled": true
+    },
+    {
+      "label": "Customer Category",
+      "type": "textfield",
+      "id": "Field_CustomerCategory",
+      "key": "customerCategory",
+      "disabled": true
+    },
+    {
+      "label": "Product ID",
+      "type": "textfield",
+      "id": "Field_ProductId",
+      "key": "productId",
+      "disabled": true
+    },
+    {
+      "label": "Quantity",
+      "type": "number",
+      "id": "Field_Quantity",
+      "key": "quantity",
+      "disabled": true
+    },
+    {
+      "label": "Order Total ($)",
+      "type": "number",
+      "id": "Field_OrderTotal",
+      "key": "orderTotal",
+      "disabled": true
+    },
+    {
+      "label": "Assigned Priority",
+      "type": "textfield",
+      "id": "Field_Priority",
+      "key": "priority",
+      "disabled": true
+    },
+    {
+      "label": "Verification Decision",
+      "type": "radio",
+      "id": "Field_VerificationStatus",
+      "key": "verificationStatus",
+      "validate": {
+        "required": true
+      },
+      "values": [
+        {
+          "label": "Approve Order for Payment",
+          "value": "APPROVED"
+        },
+        {
+          "label": "Reject Order",
+          "value": "REJECTED"
+        }
+      ]
+    },
+    {
+      "label": "Verifier Comments",
+      "type": "textarea",
+      "id": "Field_VerificationNotes",
+      "key": "verificationNotes"
+    }
+  ]
+}
+

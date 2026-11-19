@@ -1,0 +1,134 @@
+### Lab 3 – Hospital Triage: HTTP Requests
+
+> **DISCLAIMER**: This is an educational demonstration only. It does not constitute real medical advice.
+
+@workerUrl = http://localhost:8096
+@mockApiUrl = http://localhost:8090
+
+### ===== DEPLOY =====
+
+### Deploy BPMN + DMN
+POST {{workerUrl}}/workflow/deploy
+
+### ===== TOPOLOGY =====
+
+### Zeebe Connection Check
+GET {{workerUrl}}/workflow/topology
+
+### ===== TC-L3-01: ROUTINE PATIENT (LOW PRIORITY) =====
+
+### Expected: Triage=LOW → "Book Appointment" worker → appointment booked
+POST {{workerUrl}}/workflow/start
+Content-Type: application/json
+
+{
+  "patientRef": "SYN-PAT-001",
+  "appointmentPreference": "MORNING",
+  "symptomsSummary": "Mild headache for 2 days, no fever",
+  "chestPain": false,
+  "breathingDifficulty": false,
+  "feverDays": 0,
+  "painScore": 2
+}
+
+### ===== TC-L3-02: MODERATE PATIENT =====
+
+### Expected: Triage=MEDIUM → appointment + possible consultation
+POST {{workerUrl}}/workflow/start
+Content-Type: application/json
+
+{
+  "patientRef": "SYN-PAT-002",
+  "appointmentPreference": "AFTERNOON",
+  "symptomsSummary": "Persistent fever for 4 days with moderate pain",
+  "chestPain": false,
+  "breathingDifficulty": false,
+  "feverDays": 4,
+  "painScore": 6
+}
+
+### ===== TC-L3-03: URGENT PATIENT (CHEST PAIN) =====
+
+### Expected: Triage=URGENT → "Urgent Clinical Assessment" user task
+POST {{workerUrl}}/workflow/start
+Content-Type: application/json
+
+{
+  "patientRef": "SYN-PAT-003",
+  "appointmentPreference": "MORNING",
+  "symptomsSummary": "Chest pain and shortness of breath since 2 hours",
+  "chestPain": true,
+  "breathingDifficulty": true,
+  "feverDays": 0,
+  "painScore": 8
+}
+
+### ===== TC-L3-04: NO SLOTS AVAILABLE =====
+
+### First disable slots, then start routine patient → "Staff Slot Review" user task
+# Step 1: Disable slots
+POST {{mockApiUrl}}/admin/slots-availability
+Content-Type: application/json
+
+{"available": false}
+
+###
+# Step 2: Start a routine patient request
+POST {{workerUrl}}/workflow/start
+Content-Type: application/json
+
+{
+  "patientRef": "SYN-PAT-004-NOSLOT",
+  "appointmentPreference": "MORNING",
+  "symptomsSummary": "Routine checkup requested",
+  "chestPain": false,
+  "breathingDifficulty": false,
+  "feverDays": 0,
+  "painScore": 1
+}
+
+###
+# Step 3: Re-enable slots (restore normal operation)
+POST {{mockApiUrl}}/admin/slots-availability
+Content-Type: application/json
+
+{"available": true}
+
+### ===== SCHEDULING API DIRECT CALL =====
+
+### Direct slot availability check (bypasses process)
+GET {{mockApiUrl}}/scheduling/slots?preference=MORNING
+
+### ===== FAILURE INJECTION =====
+
+### Enable scheduling API failure mode
+POST {{mockApiUrl}}/admin/failure-mode
+Content-Type: application/json
+
+{"enabled": true}
+
+### Disable scheduling API failure mode
+POST {{mockApiUrl}}/admin/failure-mode
+Content-Type: application/json
+
+{"enabled": false}
+
+### Enable worker failure mode
+POST {{workerUrl}}/worker-config/failure-mode
+Content-Type: application/json
+
+{"enabled": true}
+
+### Disable worker failure mode
+POST {{workerUrl}}/worker-config/failure-mode
+Content-Type: application/json
+
+{"enabled": false}
+
+### ===== STATUS =====
+
+GET {{mockApiUrl}}/health
+GET {{mockApiUrl}}/admin/status
+GET {{workerUrl}}/actuator/health
+GET {{workerUrl}}/worker-config/status
+

@@ -1,0 +1,131 @@
+### Lab 1 – Loan Approval: HTTP Requests (VS Code REST Client / IntelliJ HTTP Client)
+
+@workerUrl = http://localhost:8092
+@mockApiUrl = http://localhost:8088
+
+### ===== DEPLOY =====
+
+### Deploy BPMN + DMN
+POST {{workerUrl}}/workflow/deploy
+
+### ===== TOPOLOGY =====
+
+### Zeebe Connection Check
+GET {{workerUrl}}/workflow/topology
+
+### ===== TC-L1-01: APPROVED =====
+
+### Eligible Applicant – Expected: APPROVED
+POST {{workerUrl}}/workflow/start
+Content-Type: application/json
+
+{
+  "applicantId": "SYN-APP-001-PASS",
+  "applicantName": "Alice Johnson",
+  "age": 35,
+  "employmentStatus": "EMPLOYED",
+  "requestedAmount": 10000,
+  "monthlyIncome": 5000,
+  "existingMonthlyDebt": 800,
+  "loanTermMonths": 60
+}
+
+### ===== TC-L1-02: REJECTED =====
+
+### Ineligible Applicant – Expected: REJECTED
+POST {{workerUrl}}/workflow/start
+Content-Type: application/json
+
+{
+  "applicantId": "SYN-APP-002-FAIL",
+  "applicantName": "Bob Smith",
+  "age": 25,
+  "employmentStatus": "UNEMPLOYED",
+  "requestedAmount": 25000,
+  "monthlyIncome": 1200,
+  "existingMonthlyDebt": 700,
+  "loanTermMonths": 60
+}
+
+### ===== TC-L1-03: MANUAL REVIEW =====
+
+### Borderline Applicant – Expected: MANUAL_REVIEW (User Task in Tasklist)
+POST {{workerUrl}}/workflow/start
+Content-Type: application/json
+
+{
+  "applicantId": "SYN-APP-003-MANUAL",
+  "applicantName": "Carol Davis",
+  "age": 42,
+  "employmentStatus": "SELF_EMPLOYED",
+  "requestedAmount": 30000,
+  "monthlyIncome": 4000,
+  "existingMonthlyDebt": 1200,
+  "loanTermMonths": 48
+}
+
+### ===== CREDIT API DIRECT CALL =====
+
+### Direct credit assessment (bypasses process)
+POST {{mockApiUrl}}/credit/assess
+Content-Type: application/json
+
+{
+  "applicantId": "SYN-APP-DIRECT-001",
+  "requestedAmount": 10000,
+  "monthlyIncome": 4000,
+  "employmentStatus": "EMPLOYED"
+}
+
+### ===== FAILURE INJECTION =====
+
+### Enable API failure mode
+POST {{mockApiUrl}}/admin/failure-mode
+Content-Type: application/json
+
+{"enabled": true}
+
+### Disable API failure mode
+POST {{mockApiUrl}}/admin/failure-mode
+Content-Type: application/json
+
+{"enabled": false}
+
+### Enable timeout simulation (10 seconds)
+POST {{mockApiUrl}}/admin/timeout-mode
+Content-Type: application/json
+
+{"enabled": true, "delaySeconds": 10}
+
+### Disable timeout simulation
+POST {{mockApiUrl}}/admin/timeout-mode
+Content-Type: application/json
+
+{"enabled": false}
+
+### Enable worker failure mode
+POST {{workerUrl}}/worker-config/failure-mode
+Content-Type: application/json
+
+{"enabled": true}
+
+### Disable worker failure mode
+POST {{workerUrl}}/worker-config/failure-mode
+Content-Type: application/json
+
+{"enabled": false}
+
+### ===== STATUS =====
+
+### Mock API health
+GET {{mockApiUrl}}/health
+
+### Mock API admin status
+GET {{mockApiUrl}}/admin/status
+
+### Worker config status
+GET {{workerUrl}}/worker-config/status
+
+### Worker actuator health
+GET {{workerUrl}}/actuator/health
+

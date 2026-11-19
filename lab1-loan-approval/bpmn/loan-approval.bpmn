@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:zeebe="http://camunda.org/schema/zeebe/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_LoanApproval" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.50.1">
+  <bpmn:process id="loan-approval-process" name="Loan Approval Process" isExecutable="true">
+    <bpmn:documentation>Camunda 8 Lab 1: End-to-End Loan Approval Workflow with Job Worker, REST Connector, DMN, and User Task.</bpmn:documentation>
+    <bpmn:startEvent id="StartEvent_LoanApplication" name="Loan Application Received">
+      <bpmn:documentation>Input Variables: applicantId (String), applicantName (String), age (Integer), employmentStatus (String), requestedAmount (Number), monthlyIncome (Number), existingMonthlyDebt (Number), loanTermMonths (Integer)</bpmn:documentation>
+      <bpmn:outgoing>Flow_StartToValidate</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_StartToValidate" sourceRef="StartEvent_LoanApplication" targetRef="Task_ValidateApplicant" />
+    <bpmn:serviceTask id="Task_ValidateApplicant" name="Validate Applicant Details">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="validate-applicant" retries="3" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_StartToValidate</bpmn:incoming>
+      <bpmn:outgoing>Flow_ValidateToGateway</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_ValidateToGateway" sourceRef="Task_ValidateApplicant" targetRef="Gateway_ValidationCheck" />
+    <bpmn:exclusiveGateway id="Gateway_ValidationCheck" name="Applicant Valid?" default="Flow_ValidationPassed">
+      <bpmn:incoming>Flow_ValidateToGateway</bpmn:incoming>
+      <bpmn:outgoing>Flow_ValidationPassed</bpmn:outgoing>
+      <bpmn:outgoing>Flow_ValidationFailed</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_ValidationPassed" name="Valid" sourceRef="Gateway_ValidationCheck" targetRef="Task_CreditAssessment" />
+    <bpmn:sequenceFlow id="Flow_ValidationFailed" name="Invalid" sourceRef="Gateway_ValidationCheck" targetRef="EndEvent_ValidationFailed">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=(isValid = false)</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:serviceTask id="Task_CreditAssessment" name="Assess Credit Risk (REST Connector)" zeebe:modelerTemplate="io.camunda.connectors.HttpJson.v2" zeebe:modelerTemplateVersion="13" zeebe:modelerTemplateIcon="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgiIGhlaWdodD0iMTgiIHZpZXdCb3g9IjAgMCAxOCAxOCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTE3LjAzMzUgOC45OTk5N0MxNy4wMzM1IDEzLjQ0NzUgMTMuNDI4MSAxNy4wNTI5IDguOTgwNjUgMTcuMDUyOUM0LjUzMzE2IDE3LjA1MjkgMC45Mjc3NjUgMTMuNDQ3NSAwLjkyNzc2NSA4Ljk5OTk3QzAuOTI3NzY1IDQuNTUyNDggNC41MzMxNiAwLjk0NzA4MyA4Ljk4MDY1IDAuOTQ3MDgzQzEzLjQyODEgMC45NDcwODMgMTcuMDMzNSA0LjU1MjQ4IDE3LjAzMzUgOC45OTk5N1oiIGZpbGw9IiM1MDU1NjIiLz4KPHBhdGggZD0iTTQuOTMxMjYgMTQuMTU3MUw2Ljc4MTA2IDMuNzE0NzFIMTAuMTM3NUMxMS4xOTE3IDMuNzE0NzEgMTEuOTgyNCAzLjk4MzIzIDEyLjUwOTUgNC41MjAyN0MxMy4wNDY1IDUuMDQ3MzYgMTMuMzE1IDUuNzMzNTggMTMuMzE1IDYuNTc4OTJDMTMuMzE1IDcuNDQ0MTQgMTMuMDcxNCA4LjE1NTIyIDEyLjU4NDEgOC43MTIxNUMxMi4xMDY3IDkuMjU5MTMgMTEuNDU1MyA5LjYzNzA1IDEwLjYyOTggOS44NDU5TDEyLjA2MTkgMTQuMTU3MUgxMC4zMzE1TDkuMDMzNjQgMTAuMDI0OUg3LjI0MzUxTDYuNTEyNTQgMTQuMTU3MUg0LjkzMTI2Wk03LjQ5NzExIDguNTkyODFIOS4yNDI0OEM5Ljk5ODMyIDguNTkyODEgMTAuNTkwMSA4LjQyMzc0IDExLjAxNzcgOC4wODU2MUMxMS40NTUzIDcuNzM3NTMgMTEuNjc0MSA3LjI2NTEzIDExLjY3NDEgNi42Njg0MkMxMS42NzQxIDYuMTkxMDYgMTEuNTI0OSA1LjgxODExIDExLjIyNjUgNS41NDk1OUMxMC45MjgyIDUuMjcxMTMgMTAuNDU1OCA1LjEzMTkgOS44MDkzNiA1LjEzMTlIOC4xMDg3NEw3LjQ5NzExIDguNTkyODFaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4K">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="io.camunda:http-json:1" retries="3" />
+        <zeebe:ioMapping>
+          <zeebe:input source="noAuth" target="authentication.type" />
+          <zeebe:input source="POST" target="method" />
+          <zeebe:input source="http://localhost:8088/credit/assess" target="url" />
+          <zeebe:input source="=false" target="storeResponse" />
+          <zeebe:input source="=false" target="followRedirects" />
+          <zeebe:input source="=20" target="connectionTimeoutInSeconds" />
+          <zeebe:input source="=20" target="readTimeoutInSeconds" />
+          <zeebe:input source="={&#34;applicantId&#34;: applicantId, &#34;monthlyIncome&#34;: monthlyIncome, &#34;requestedAmount&#34;: requestedAmount, &#34;employmentStatus&#34;: employmentStatus}" target="body" />
+          <zeebe:input source="=false" target="ignoreNullValues" />
+        </zeebe:ioMapping>
+        <zeebe:taskHeaders>
+          <zeebe:header key="elementTemplateVersion" value="13" />
+          <zeebe:header key="elementTemplateId" value="io.camunda.connectors.HttpJson.v2" />
+          <zeebe:header key="resultVariable" value="creditAssessment" />
+          <zeebe:header key="resultExpression" value="={&#10;  myResponseBody: response.body&#10;  // Use FEEL to extract values, e.g.,:&#10;  // myUserId: response.body.post.userId&#10;}" />
+          <zeebe:header key="retryBackoff" value="PT0S" />
+        </zeebe:taskHeaders>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_ValidationPassed</bpmn:incoming>
+      <bpmn:outgoing>Flow_CreditToDMN</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_CreditToDMN" sourceRef="Task_CreditAssessment" targetRef="Task_LoanDecisionDMN" />
+    <bpmn:businessRuleTask id="Task_LoanDecisionDMN" name="Evaluate Loan Decision (DMN)">
+      <bpmn:extensionElements>
+        <zeebe:calledDecision decisionId="loan-decision" resultVariable="decisionResult" />
+        <zeebe:ioMapping>
+          <zeebe:output source="=decisionResult.decision" target="decision" />
+          <zeebe:output source="=decisionResult.reason" target="reason" />
+        </zeebe:ioMapping>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_CreditToDMN</bpmn:incoming>
+      <bpmn:outgoing>Flow_DMNToGateway</bpmn:outgoing>
+    </bpmn:businessRuleTask>
+    <bpmn:sequenceFlow id="Flow_DMNToGateway" sourceRef="Task_LoanDecisionDMN" targetRef="Gateway_EvaluateDecision" />
+    <bpmn:exclusiveGateway id="Gateway_EvaluateDecision" name="Evaluate Decision" default="Flow_RouteManualReview">
+      <bpmn:incoming>Flow_DMNToGateway</bpmn:incoming>
+      <bpmn:outgoing>Flow_RouteApproved</bpmn:outgoing>
+      <bpmn:outgoing>Flow_RouteRejected</bpmn:outgoing>
+      <bpmn:outgoing>Flow_RouteManualReview</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_RouteApproved" name="Approved" sourceRef="Gateway_EvaluateDecision" targetRef="EndEvent_Approved">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=(decision = "APPROVED")</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_RouteRejected" name="Rejected" sourceRef="Gateway_EvaluateDecision" targetRef="EndEvent_Rejected">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=(decision = "REJECTED")</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_RouteManualReview" name="Manual Review" sourceRef="Gateway_EvaluateDecision" targetRef="Task_ManualReview" />
+    <bpmn:userTask id="Task_ManualReview" name="Manual Underwriter Review">
+      <bpmn:extensionElements>
+        <zeebe:assignmentDefinition candidateGroups="loan-officers,demo" candidateUsers="demo" />
+        <zeebe:formDefinition formId="Form_LoanManualReview" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_RouteManualReview</bpmn:incoming>
+      <bpmn:outgoing>Flow_ManualToOfficerGateway</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="Flow_ManualToOfficerGateway" sourceRef="Task_ManualReview" targetRef="Gateway_OfficerDecision" />
+    <bpmn:exclusiveGateway id="Gateway_OfficerDecision" name="Officer Decision?" default="Flow_OfficerRejected">
+      <bpmn:incoming>Flow_ManualToOfficerGateway</bpmn:incoming>
+      <bpmn:outgoing>Flow_OfficerApproved</bpmn:outgoing>
+      <bpmn:outgoing>Flow_OfficerRejected</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_OfficerApproved" name="Approved" sourceRef="Gateway_OfficerDecision" targetRef="EndEvent_Approved">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=(manualReviewDecision = "APPROVED")</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_OfficerRejected" name="Rejected" sourceRef="Gateway_OfficerDecision" targetRef="EndEvent_Rejected" />
+    <bpmn:endEvent id="EndEvent_Approved" name="Loan Approved">
+      <bpmn:incoming>Flow_RouteApproved</bpmn:incoming>
+      <bpmn:incoming>Flow_OfficerApproved</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:endEvent id="EndEvent_Rejected" name="Loan Denied">
+      <bpmn:incoming>Flow_RouteRejected</bpmn:incoming>
+      <bpmn:incoming>Flow_OfficerRejected</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:endEvent id="EndEvent_ValidationFailed" name="Application Rejected (Validation Failed)">
+      <bpmn:incoming>Flow_ValidationFailed</bpmn:incoming>
+    </bpmn:endEvent>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_LoanApproval">
+    <bpmndi:BPMNPlane id="BPMNPlane_LoanApproval" bpmnElement="loan-approval-process">
+      <bpmndi:BPMNShape id="Shape_StartEvent" bpmnElement="StartEvent_LoanApplication">
+        <dc:Bounds x="162" y="142" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="138" y="185" width="85" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_ValidateApplicant" bpmnElement="Task_ValidateApplicant">
+        <dc:Bounds x="250" y="120" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_ValidationGateway" bpmnElement="Gateway_ValidationCheck" isMarkerVisible="true">
+        <dc:Bounds x="425" y="135" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="410" y="105" width="81" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_CreditAssessment" bpmnElement="Task_CreditAssessment">
+        <dc:Bounds x="530" y="120" width="130" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_LoanDecisionDMN" bpmnElement="Task_LoanDecisionDMN">
+        <dc:Bounds x="710" y="120" width="130" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_EvaluateDecision" bpmnElement="Gateway_EvaluateDecision" isMarkerVisible="true">
+        <dc:Bounds x="895" y="135" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="865" y="192" width="89" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Approved" bpmnElement="EndEvent_Approved">
+        <dc:Bounds x="1332" y="62" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1312" y="105" width="76" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Rejected" bpmnElement="EndEvent_Rejected">
+        <dc:Bounds x="1332" y="222" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1319" y="265" width="63" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_ValidationFailed" bpmnElement="EndEvent_ValidationFailed">
+        <dc:Bounds x="432" y="262" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="408" y="305" width="85" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_OfficerDecision" bpmnElement="Gateway_OfficerDecision" isMarkerVisible="true">
+        <dc:Bounds x="1205" y="135" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1265" y="153" width="84" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_ManualReview" bpmnElement="Task_ManualReview">
+        <dc:Bounds x="1025" y="120" width="130" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Edge_StartToValidate" bpmnElement="Flow_StartToValidate">
+        <di:waypoint x="198" y="160" />
+        <di:waypoint x="250" y="160" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_ValidateToGateway" bpmnElement="Flow_ValidateToGateway">
+        <di:waypoint x="370" y="160" />
+        <di:waypoint x="425" y="160" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_ValidationPassed" bpmnElement="Flow_ValidationPassed">
+        <di:waypoint x="475" y="160" />
+        <di:waypoint x="530" y="160" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="491" y="142" width="23" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_ValidationFailed" bpmnElement="Flow_ValidationFailed">
+        <di:waypoint x="450" y="185" />
+        <di:waypoint x="450" y="262" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="455" y="221" width="33" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_CreditToDMN" bpmnElement="Flow_CreditToDMN">
+        <di:waypoint x="660" y="160" />
+        <di:waypoint x="710" y="160" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_DMNToGateway" bpmnElement="Flow_DMNToGateway">
+        <di:waypoint x="840" y="160" />
+        <di:waypoint x="895" y="160" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_RouteApproved" bpmnElement="Flow_RouteApproved">
+        <di:waypoint x="920" y="135" />
+        <di:waypoint x="920" y="80" />
+        <di:waypoint x="1332" y="80" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="930" y="60" width="47" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_RouteRejected" bpmnElement="Flow_RouteRejected">
+        <di:waypoint x="920" y="185" />
+        <di:waypoint x="920" y="240" />
+        <di:waypoint x="1332" y="240" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="930" y="243" width="44" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_RouteManualReview" bpmnElement="Flow_RouteManualReview">
+        <di:waypoint x="945" y="160" />
+        <di:waypoint x="1025" y="160" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="949" y="142" width="76" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_ManualToOfficerGateway" bpmnElement="Flow_ManualToOfficerGateway">
+        <di:waypoint x="1155" y="160" />
+        <di:waypoint x="1205" y="160" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_OfficerApproved" bpmnElement="Flow_OfficerApproved">
+        <di:waypoint x="1230" y="135" />
+        <di:waypoint x="1230" y="80" />
+        <di:waypoint x="1332" y="80" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1234" y="60" width="48" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_OfficerRejected" bpmnElement="Flow_OfficerRejected">
+        <di:waypoint x="1230" y="185" />
+        <di:waypoint x="1230" y="240" />
+        <di:waypoint x="1332" y="240" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1235" y="243" width="44" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

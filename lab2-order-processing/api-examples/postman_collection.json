@@ -1,0 +1,39 @@
+{
+  "info": {
+    "name": "PBJ-2 Lab 2 Order Processing API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Deploy BPMN & DMN",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:8094/workflow/deploy"
+      }
+    },
+    {
+      "name": "2. Start Process - Standard Order",
+      "request": {
+        "method": "POST",
+        "header": [{"key": "Content-Type", "value": "application/json"}],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"customerRef\": \"SYN-CUST-001\",\n  \"customerCategory\": \"STANDARD\",\n  \"productId\": \"PROD-001\",\n  \"quantity\": 1,\n  \"deliveryPreference\": \"STANDARD\",\n  \"paymentToken\": \"tok_test_success\"\n}"
+        },
+        "url": "http://localhost:8094/workflow/start"
+      }
+    },
+    {
+      "name": "3. Direct Payment Charge",
+      "request": {
+        "method": "POST",
+        "header": [{"key": "Content-Type", "value": "application/json"}],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"customerRef\": \"SYN-CUST-DIRECT\",\n  \"paymentToken\": \"tok_test_success\",\n  \"orderTotal\": 199.99\n}"
+        },
+        "url": "http://localhost:8089/payments/charge"
+      }
+    }
+  ]
+}

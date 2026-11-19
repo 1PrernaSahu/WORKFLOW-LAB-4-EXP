@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/"
+             xmlns:dmndi="https://www.omg.org/spec/DMN/20191111/DMNDI/"
+             xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/"
+             id="Definitions_OrderPriority"
+             name="Order Priority Definitions"
+             namespace="http://camunda.org/schema/1.0/dmn">
+  <decision id="order-priority" name="Order Priority">
+    <decisionTable id="DecisionTable_OrderPriority" hitPolicy="FIRST">
+      <input id="Input_OrderTotal" label="Order Total ($)">
+        <inputExpression id="InputExpr_OrderTotal" typeRef="number">
+          <text>orderTotal</text>
+        </inputExpression>
+      </input>
+      <input id="Input_CustomerCategory" label="Customer Category">
+        <inputExpression id="InputExpr_CustomerCategory" typeRef="string">
+          <text>customerCategory</text>
+        </inputExpression>
+      </input>
+      <input id="Input_DeliveryPreference" label="Delivery Preference">
+        <inputExpression id="InputExpr_DeliveryPreference" typeRef="string">
+          <text>deliveryPreference</text>
+        </inputExpression>
+      </input>
+      <output id="Output_Priority" label="Priority" name="priority" typeRef="string" />
+      <output id="Output_HighValueFlag" label="High Value Flag" name="highValueFlag" typeRef="boolean" />
+
+      <!-- Rule 1: High Value Transaction Cap -->
+      <rule id="Rule_1">
+        <description>Orders exceeding $5,000 are critical and require manual security verification.</description>
+        <inputEntry id="InputEntry_1_1">
+          <text>&gt;= 5000</text>
+        </inputEntry>
+        <inputEntry id="InputEntry_1_2">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="InputEntry_1_3">
+          <text>-</text>
+        </inputEntry>
+        <outputEntry id="OutputEntry_1_1">
+          <text>"CRITICAL"</text>
+        </outputEntry>
+        <outputEntry id="OutputEntry_1_2">
+          <text>true</text>
+        </outputEntry>
+      </rule>
+
+      <!-- Rule 2: Platinum Expedited Fast-Track -->
+      <rule id="Rule_2">
+        <description>Platinum customer with expedited delivery gets critical priority without manual gate.</description>
+        <inputEntry id="InputEntry_2_1">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="InputEntry_2_2">
+          <text>"PLATINUM"</text>
+        </inputEntry>
+        <inputEntry id="InputEntry_2_3">
+          <text>"EXPRESS", "NEXT_DAY"</text>
+        </inputEntry>
+        <outputEntry id="OutputEntry_2_1">
+          <text>"CRITICAL"</text>
+        </outputEntry>
+        <outputEntry id="OutputEntry_2_2">
+          <text>false</text>
+        </outputEntry>
+      </rule>
+
+      <!-- Rule 3: Platinum Standard Tier -->
+      <rule id="Rule_3">
+        <description>Platinum customer default high priority.</description>
+        <inputEntry id="InputEntry_3_1">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="InputEntry_3_2">
+          <text>"PLATINUM"</text>
+        </inputEntry>
+        <inputEntry id="InputEntry_3_3">
+          <text>-</text>
+        </inputEntry>
+        <outputEntry id="OutputEntry_3_1">
+          <text>"HIGH"</text>
+        </outputEntry>
+        <outputEntry id="OutputEntry_3_2">
+          <text>false</text>
+        </outputEntry>
+      </rule>
+
+      <!-- Rule 4: Gold High Volume -->
+      <rule id="Rule_4">
+        <description>Gold tier order of $1,000 or more receives high priority.</description>
+        <inputEntry id="InputEntry_4_1">
+          <text>&gt;= 1000</text>
+        </inputEntry>
+        <inputEntry id="InputEntry_4_2">
+          <text>"GOLD"</text>
+        </inputEntry>
+        <inputEntry id="InputEntry_4_3">
+          <text>-</text>
+        </inputEntry>
+        <outputEntry id="OutputEntry_4_1">
+          <text>"HIGH"</text>
+        </outputEntry>
+        <outputEntry id="OutputEntry_4_2">
+          <text>false</text>
+        </outputEntry>
+      </rule>
+
+      <!-- Rule 5: Standard Large Cart Review -->
+      <rule id="Rule_5">
+        <description>Standard customer cart >= $2,000 requires manual verification.</description>
+        <inputEntry id="InputEntry_5_1">
+          <text>&gt;= 2000</text>
+        </inputEntry>
+        <inputEntry id="InputEntry_5_2">
+          <text>"STANDARD"</text>
+        </inputEntry>
+        <inputEntry id="InputEntry_5_3">
+          <text>-</text>
+        </inputEntry>
+        <outputEntry id="OutputEntry_5_1">
+          <text>"HIGH"</text>
+        </outputEntry>
+        <outputEntry id="OutputEntry_5_2">
+          <text>true</text>
+        </outputEntry>
+      </rule>
+
+      <!-- Rule 6: Next-Day Delivery Priority -->
+      <rule id="Rule_6">
+        <description>Next-day shipping priority for fulfillment queue.</description>
+        <inputEntry id="InputEntry_6_1">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="InputEntry_6_2">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="InputEntry_6_3">
+          <text>"NEXT_DAY"</text>
+        </inputEntry>
+        <outputEntry id="OutputEntry_6_1">
+          <text>"HIGH"</text>
+        </outputEntry>
+        <outputEntry id="OutputEntry_6_2">
+          <text>false</text>
+        </outputEntry>
+      </rule>
+
+      <!-- Rule 7: Gold Standard Tier -->
+      <rule id="Rule_7">
+        <description>Gold tier regular priority.</description>
+        <inputEntry id="InputEntry_7_1">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="InputEntry_7_2">
+          <text>"GOLD"</text>
+        </inputEntry>
+        <inputEntry id="InputEntry_7_3">
+          <text>-</text>
+        </inputEntry>
+        <outputEntry id="OutputEntry_7_1">
+          <text>"MEDIUM"</text>
+        </outputEntry>
+        <outputEntry id="OutputEntry_7_2">
+          <text>false</text>
+        </outputEntry>
+      </rule>
+
+      <!-- Rule 8: Catch-All Standard Priority -->
+      <rule id="Rule_8">
+        <description>Standard regular priority catch-all rule.</description>
+        <inputEntry id="InputEntry_8_1">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="InputEntry_8_2">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="InputEntry_8_3">
+          <text>-</text>
+        </inputEntry>
+        <outputEntry id="OutputEntry_8_1">
+          <text>"LOW"</text>
+        </outputEntry>
+        <outputEntry id="OutputEntry_8_2">
+          <text>false</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  <dmndi:DMNDI>
+    <dmndi:DMNDiagram id="DMNDiagram_OrderPriority">
+      <dmndi:DMNShape id="DMNShape_order-priority" dmnElementRef="order-priority">
+        <dc:Bounds height="80" width="180" x="160" y="80"/>
+      </dmndi:DMNShape>
+    </dmndi:DMNDiagram>
+  </dmndi:DMNDI>
+</definitions>
+

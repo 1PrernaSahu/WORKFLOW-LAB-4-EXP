@@ -1,0 +1,58 @@
+{
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.6.0",
+  "exporter": {
+    "name": "Camunda Modeler",
+    "version": "5.50.1"
+  },
+  "schemaVersion": 16,
+  "id": "Form_StaffSlotReview",
+  "type": "default",
+  "components": [
+    {
+      "text": "### Clinic Slot Full - Manual Staff Allocation\nAll standard automated scheduling slots are currently booked. Staff review is required to allocate an overflow or waitlist slot.",
+      "type": "text",
+      "id": "Text_SlotReviewNotice"
+    },
+    {
+      "label": "Synthetic Patient Reference",
+      "type": "textfield",
+      "id": "Field_PatientRef_S",
+      "key": "patientRef",
+      "disabled": true
+    },
+    {
+      "label": "Preferred Window",
+      "type": "textfield",
+      "id": "Field_Pref_S",
+      "key": "appointmentPreference",
+      "disabled": true
+    },
+    {
+      "label": "Staff Allocation Decision",
+      "type": "radio",
+      "id": "Field_SlotAction",
+      "key": "manualSlotDecision",
+      "validate": {
+        "required": true
+      },
+      "values": [
+        {
+          "label": "Allocate Overflow Slot Tomorrow",
+          "value": "ALLOCATE_OVERFLOW"
+        },
+        {
+          "label": "Place on Priority Waitlist",
+          "value": "ADD_TO_WAITLIST"
+        }
+      ]
+    },
+    {
+      "label": "Assigned Slot Identifier",
+      "type": "textfield",
+      "id": "Field_ManualSlotId",
+      "key": "manualSlotId"
+    }
+  ]
+}
+
