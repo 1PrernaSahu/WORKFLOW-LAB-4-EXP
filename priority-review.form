@@ -1,0 +1,72 @@
+{
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.6.0",
+  "exporter": {
+    "name": "Camunda Modeler",
+    "version": "5.50.1"
+  },
+  "schemaVersion": 16,
+  "id": "Form_PriorityStaffReview",
+  "type": "default",
+  "components": [
+    {
+      "text": "### Priority Clinical Review\n**Notice: Educational triage demonstration workflow only.**\n\nPatient flagged for priority staff evaluation within 4 hours.",
+      "type": "text",
+      "id": "Text_PriorityNotice"
+    },
+    {
+      "label": "Synthetic Patient Reference",
+      "type": "textfield",
+      "id": "Field_PatientRef_P",
+      "key": "patientRef",
+      "disabled": true
+    },
+    {
+      "label": "Reported Symptoms",
+      "type": "textarea",
+      "id": "Field_Symptoms_P",
+      "key": "symptomsSummary",
+      "disabled": true
+    },
+    {
+      "label": "Fever Days",
+      "type": "number",
+      "id": "Field_Fever_P",
+      "key": "feverDays",
+      "disabled": true
+    },
+    {
+      "label": "Pain Score (1-10)",
+      "type": "number",
+      "id": "Field_Pain_P",
+      "key": "painScore",
+      "disabled": true
+    },
+    {
+      "label": "Priority Action",
+      "type": "radio",
+      "id": "Field_PriorityAction",
+      "key": "priorityReviewAction",
+      "validate": {
+        "required": true
+      },
+      "values": [
+        {
+          "label": "Assign Same-Day Priority Slot",
+          "value": "ASSIGN_SAMEDAY"
+        },
+        {
+          "label": "Refer to Urgent Care Clinic",
+          "value": "REFER_URGENT_CARE"
+        }
+      ]
+    },
+    {
+      "label": "Review Notes",
+      "type": "textarea",
+      "id": "Field_StaffNotes_P",
+      "key": "staffReviewNotes"
+    }
+  ]
+}
+

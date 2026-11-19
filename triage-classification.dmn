@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/"
+             xmlns:dmndi="https://www.omg.org/spec/DMN/20191111/DMNDI/"
+             xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/"
+             id="Definitions_TriageClassification"
+             name="Hospital Triage Classification Definitions"
+             namespace="http://camunda.org/schema/1.0/dmn">
+  <decision id="triage-classification" name="Triage Classification">
+    <decisionTable id="DecisionTable_TriageClassification" hitPolicy="FIRST">
+      <input id="Input_ChestPain" label="Chest Pain Reported">
+        <inputExpression id="InputExpr_ChestPain" typeRef="boolean">
+          <text>chestPain</text>
+        </inputExpression>
+      </input>
+      <input id="Input_BreathingDifficulty" label="Breathing Difficulty">
+        <inputExpression id="InputExpr_BreathingDifficulty" typeRef="boolean">
+          <text>breathingDifficulty</text>
+        </inputExpression>
+      </input>
+      <input id="Input_FeverDays" label="Fever Duration (Days)">
+        <inputExpression id="InputExpr_FeverDays" typeRef="number">
+          <text>feverDays</text>
+        </inputExpression>
+      </input>
+      <input id="Input_PainScore" label="Pain Score (1-10)">
+        <inputExpression id="InputExpr_PainScore" typeRef="number">
+          <text>painScore</text>
+        </inputExpression>
+      </input>
+      <output id="Output_TriageCategory" label="Triage Category" name="triageCategory" typeRef="string" />
+      <output id="Output_TriageRationale" label="Triage Rationale" name="triageRationale" typeRef="string" />
+
+      <!-- Rule 1: Chest Pain Emergency -->
+      <rule id="Rule_1">
+        <description>Chest pain is an emergency indicator requiring immediate assessment.</description>
+        <inputEntry id="InputEntry_1_1">
+          <text>true</text>
+        </inputEntry>
+        <inputEntry id="InputEntry_1_2">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="InputEntry_1_3">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="InputEntry_1_4">
+          <text>-</text>
+        </inputEntry>
+        <outputEntry id="OutputEntry_1_1">
+          <text>"URGENT_ASSESSMENT"</text>
+        </outputEntry>
+        <outputEntry id="OutputEntry_1_2">
+          <text>"Reported chest pain requires immediate emergency clinical evaluation"</text>
+        </outputEntry>
+      </rule>
+
+      <!-- Rule 2: Breathing Difficulty Emergency -->
+      <rule id="Rule_2">
+        <description>Breathing difficulty is an emergency indicator requiring immediate assessment.</description>
+        <inputEntry id="InputEntry_2_1">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="InputEntry_2_2">
+          <text>true</text>
+        </inputEntry>
+        <inputEntry id="InputEntry_2_3">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="InputEntry_2_4">
+          <text>-</text>
+        </inputEntry>
+        <outputEntry id="OutputEntry_2_1">
+          <text>"URGENT_ASSESSMENT"</text>
+        </outputEntry>
+        <outputEntry id="OutputEntry_2_2">
+          <text>"Severe breathing difficulty requires immediate emergency clinical evaluation"</text>
+        </outputEntry>
+      </rule>
+
+      <!-- Rule 3: Acute Severe Pain -->
+      <rule id="Rule_3">
+        <description>Pain score 8 or above requires urgent assessment.</description>
+        <inputEntry id="InputEntry_3_1">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="InputEntry_3_2">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="InputEntry_3_3">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="InputEntry_3_4">
+          <text>&gt;= 8</text>
+        </inputEntry>
+        <outputEntry id="OutputEntry_3_1">
+          <text>"URGENT_ASSESSMENT"</text>
+        </outputEntry>
+        <outputEntry id="OutputEntry_3_2">
+          <text>"Severe acute pain (score &gt;= 8) requires immediate clinician attention"</text>
+        </outputEntry>
+      </rule>
+
+      <!-- Rule 4: Prolonged Fever with Moderate Pain -->
+      <rule id="Rule_4">
+        <description>Fever >= 5 days and pain score >= 5 requires priority review.</description>
+        <inputEntry id="InputEntry_4_1">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="InputEntry_4_2">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="InputEntry_4_3">
+          <text>&gt;= 5</text>
+        </inputEntry>
+        <inputEntry id="InputEntry_4_4">
+          <text>&gt;= 5</text>
+        </inputEntry>
+        <outputEntry id="OutputEntry_4_1">
+          <text>"PRIORITY_REVIEW"</text>
+        </outputEntry>
+        <outputEntry id="OutputEntry_4_2">
+          <text>"Prolonged fever (&gt;= 5 days) with moderate pain warrants priority clinical review"</text>
+        </outputEntry>
+      </rule>
+
+      <!-- Rule 5: Moderate Pain Score -->
+      <rule id="Rule_5">
+        <description>Pain score >= 5 marked for priority review.</description>
+        <inputEntry id="InputEntry_5_1">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="InputEntry_5_2">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="InputEntry_5_3">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="InputEntry_5_4">
+          <text>&gt;= 5</text>
+        </inputEntry>
+        <outputEntry id="OutputEntry_5_1">
+          <text>"PRIORITY_REVIEW"</text>
+        </outputEntry>
+        <outputEntry id="OutputEntry_5_2">
+          <text>"Moderate pain score (&gt;= 5) marked for priority nurse triage"</text>
+        </outputEntry>
+      </rule>
+
+      <!-- Rule 6: Persistent Fever -->
+      <rule id="Rule_6">
+        <description>Fever exceeding 3 days flagged for priority review.</description>
+        <inputEntry id="InputEntry_6_1">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="InputEntry_6_2">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="InputEntry_6_3">
+          <text>&gt;= 3</text>
+        </inputEntry>
+        <inputEntry id="InputEntry_6_4">
+          <text>-</text>
+        </inputEntry>
+        <outputEntry id="OutputEntry_6_1">
+          <text>"PRIORITY_REVIEW"</text>
+        </outputEntry>
+        <outputEntry id="OutputEntry_6_2">
+          <text>"Persistent fever exceeding 3 days flagged for priority staff review"</text>
+        </outputEntry>
+      </rule>
+
+      <!-- Rule 7: Catch-All Routine Appointment -->
+      <rule id="Rule_7">
+        <description>Standard routine appointment for non-urgent symptoms.</description>
+        <inputEntry id="InputEntry_7_1">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="InputEntry_7_2">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="InputEntry_7_3">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="InputEntry_7_4">
+          <text>-</text>
+        </inputEntry>
+        <outputEntry id="OutputEntry_7_1">
+          <text>"ROUTINE"</text>
+        </outputEntry>
+        <outputEntry id="OutputEntry_7_2">
+          <text>"Mild or standard symptoms suitable for routine outpatient scheduling"</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  <dmndi:DMNDI>
+    <dmndi:DMNDiagram id="DMNDiagram_TriageClassification">
+      <dmndi:DMNShape id="DMNShape_triage-classification" dmnElementRef="triage-classification">
+        <dc:Bounds height="80" width="180" x="160" y="80"/>
+      </dmndi:DMNShape>
+    </dmndi:DMNDiagram>
+  </dmndi:DMNDI>
+</definitions>
+

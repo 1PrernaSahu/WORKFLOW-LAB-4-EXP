@@ -1,0 +1,86 @@
+{
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.6.0",
+  "exporter": {
+    "name": "Camunda Modeler",
+    "version": "5.50.1"
+  },
+  "schemaVersion": 16,
+  "id": "Form_LoanManualReview",
+  "type": "default",
+  "components": [
+    {
+      "text": "### Loan Application Manual Underwriter Review\nPlease inspect the applicant details, synthetic credit score, and financial metrics before making a lending decision.",
+      "type": "text",
+      "id": "Text_Header"
+    },
+    {
+      "label": "Applicant ID",
+      "type": "textfield",
+      "id": "Field_ApplicantId",
+      "key": "applicantId",
+      "disabled": true
+    },
+    {
+      "label": "Applicant Name",
+      "type": "textfield",
+      "id": "Field_ApplicantName",
+      "key": "applicantName",
+      "disabled": true
+    },
+    {
+      "label": "Requested Amount ($)",
+      "type": "number",
+      "id": "Field_RequestedAmount",
+      "key": "requestedAmount",
+      "disabled": true
+    },
+    {
+      "label": "Credit Score",
+      "type": "number",
+      "id": "Field_CreditScore",
+      "key": "creditScore",
+      "disabled": true
+    },
+    {
+      "label": "Risk Band",
+      "type": "textfield",
+      "id": "Field_RiskBand",
+      "key": "riskBand",
+      "disabled": true
+    },
+    {
+      "label": "Debt-to-Income Ratio (DTI)",
+      "type": "number",
+      "id": "Field_DTI",
+      "key": "debtToIncomeRatio",
+      "disabled": true
+    },
+    {
+      "label": "Underwriter Decision",
+      "type": "radio",
+      "id": "Field_ManualDecision",
+      "key": "manualReviewDecision",
+      "validate": {
+        "required": true
+      },
+      "values": [
+        {
+          "label": "Approve Loan",
+          "value": "APPROVED"
+        },
+        {
+          "label": "Reject Loan",
+          "value": "REJECTED"
+        }
+      ]
+    },
+    {
+      "label": "Officer Review Comments",
+      "type": "textarea",
+      "id": "Field_Comments",
+      "key": "officerComments"
+    }
+  ]
+}
+
